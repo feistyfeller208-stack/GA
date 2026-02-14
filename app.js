@@ -306,6 +306,86 @@ ${appState.currentCV.education}`;
     renderScreen(screen);
 }
 
+function generateCVPDF() {
+    // Create CV content as HTML
+    const cvContent = `
+        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
+            <h1 style="text-align: center; color: #333;">FEISAL SINANI KITIMLA</h1>
+            <p style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px;">
+                +255 759 968 552 | feistyfella@gmail.com | Dar es Salaam
+            </p>
+            
+            <h2 style="color: #444;">PROFESSIONAL SUMMARY</h2>
+            <p>${appState.currentCV ? appState.currentCV.summary : 'Sales Professional with 3+ years experience'}</p>
+            
+            <h2 style="color: #444;">WORK EXPERIENCE</h2>
+            ${appState.currentCV ? appState.currentCV.experience.map(exp => `<p><strong>• ${exp}</strong></p>`).join('') : '<p>• Sales Officer | Goodwill Ceramics (Sept 2025–Present)</p>'}
+            
+            <h2 style="color: #444;">KEY SKILLS</h2>
+            <p>${appState.currentCV ? appState.currentCV.skills.join(' | ') : 'Direct Sales | Client Relations | Negotiation'}</p>
+            
+            <h2 style="color: #444;">EDUCATION</h2>
+            <p>${appState.currentCV ? appState.currentCV.education : 'CSEE Division I (2018)'}</p>
+            
+            <p style="margin-top: 30px; font-size: 12px; color: #666; text-align: center;">
+                References available upon request
+            </p>
+        </div>
+    `;
+
+    // Create a hidden iframe for printing
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    document.body.appendChild(iframe);
+    
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(`
+        <html>
+            <head>
+                <title>Feisal Sinani Kitimla - CV</title>
+                <style>
+                    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }
+                    @media print {
+                        body { margin: 0; padding: 20px; }
+                    }
+                </style>
+            </head>
+            <body>
+                ${cvContent}
+            </body>
+        </html>
+    `);
+    iframeDoc.close();
+
+    // Trigger print dialog (Save as PDF)
+    setTimeout(() => {
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+        
+        // Remove iframe after printing
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 1000);
+    }, 250);
+
+    const screen = `
+        <div class="prompt-line">✅ CV PDF GENERATED</div>
+        <div class="prompt-line">================================</div>
+        <div class="prompt-line success">A print dialog has opened.</div>
+        <div class="prompt-line"> </div>
+        <div class="prompt-line">📄 To save as PDF:</div>
+        <div class="prompt-line">1. In the print dialog, choose "Save as PDF"</div>
+        <div class="prompt-line">2. Click Save</div>
+        <div class="prompt-line">3. Attach to your email</div>
+        <div class="prompt-line"> </div>
+        <button class="button" onclick="generateEmailDraft()">📧 Continue to Email</button>
+        <button class="button" onclick="showGenerateOptions()">← Back</button>
+        <button class="button" onclick="logApplication()">📊 Log Application</button>
+    `;
+    renderScreen(screen);
+}
+
 function generateEmailDraft() {
     const subject = `Application for ${appState.jobTitle} - Feisal Sinani Kitimla`;
     const body = `Dear Hiring Team,
