@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUY'S APPLICATOR 🔥</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        body {
+            background: #0a0a0a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .terminal {
+            background: #1a1a1a;
+            width: 100%;
+            max-width: 500px;
+            border-radius: 12px;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0,255,0,0.3);
+            overflow: hidden;
+        }
+        .terminal-header {
+            background: #2a2a2a;
+            padding: 12px 16px;
+            border-bottom: 2px solid #00ff00;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .terminal-header .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+        .terminal-header .dot:nth-child(2) { background: #ffbd2e; }
+        .terminal-header .dot:nth-child(3) { background: #27c93f; }
+        .terminal-header span {
+            color: #00ff00;
+            margin-left: auto;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .terminal-body {
+            padding: 20px;
+            min-height: 500px;
+            color: #00ff00;
+            font-size: 16px;
+            line-height: 1.6;
+            background: #1a1a1a;
+        }
+        .prompt-line {
+            margin-bottom: 12px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .prompt-symbol {
+            color: #00ff00;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .user-input {
+            background: #2a2a2a;
+            border: 1px solid #00ff00;
+            padding: 8px 12px;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            margin: 8px 0 16px;
+            border-radius: 4px;
+            color: #ffffff;
+        }
+        .user-input:focus {
+            outline: none;
+            background: #333;
+            border-color: #00ff00;
+        }
+        .menu-option {
+            margin: 4px 0;
+            cursor: pointer;
+            padding: 4px 8px;
+            color: #00ff00;
+        }
+        .menu-option:hover {
+            background: #2a2a2a;
+        }
+        .button {
+            background: #00ff00;
+            color: #1a1a1a;
+            border: none;
+            padding: 10px 20px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 8px 4px 8px 0;
+            border-radius: 4px;
+        }
+        .button:hover {
+            background: #00cc00;
+        }
+        .output-box {
+            background: #2a2a2a;
+            border: 1px solid #00ff00;
+            padding: 12px;
+            margin: 16px 0;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            color: #ffffff;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        .success {
+            color: #00ff00;
+            font-weight: bold;
+        }
+        .error {
+            color: #ff5f56;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal" id="terminal">
+        <div class="terminal-header">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <span>GUY'S APPLICATOR v1.0</span>
+        </div>
+        <div class="terminal-body" id="terminalBody">
+            <!-- Dynamic content will be inserted here by JavaScript -->
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+  </html>
