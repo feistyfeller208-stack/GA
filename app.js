@@ -114,8 +114,9 @@ function showMainMenu() {
         <div class="prompt-line"> </div>
         <div class="menu-option" onclick="showNewApplication()">1. New Application</div>
         <div class="menu-option" onclick="showManageCVs()">2. Manage My CVs</div>
-        <div class="menu-option" onclick="showTracker()">3. View My Tracker</div>
-        <div class="menu-option" onclick="showSettings()">4. Settings</div>
+        <div class="menu-option" onclick="showTracker()">3. Application history</div>
+        <div class="menu-option" onclick="showSettings()">4. View Stats</div>
+        <div class="menu-option" onclick="showSettings()">5. Settings</div>
         <div class="prompt-line"> </div>
         <div class="prompt-line">Enter number (1-4):</div>
         <input type="text" class="user-input" id="menuInput" placeholder="Type number and press Enter" onkeypress="handleMainMenuKey(event)">
@@ -165,7 +166,79 @@ function showNewApplication() {
 
 function selectJobType(type) {
     appState.currentJobType = type;
-    showSelectCV();
+    
+    // Filter CVs based on job type
+    let filteredCVs = {};
+    
+    if (type === 'sales') {
+        // Show all sales-related CVs
+        for (let key in cvTemplates) {
+            if (key.includes('sales') || key.includes('Sales')) {
+                filteredCVs[key] = cvTemplates[key];
+            }
+        }
+    } else if (type === 'customer') {
+        // Show customer service CVs
+        for (let key in cvTemplates) {
+            if (key.includes('customer') || key.includes('service') || key.includes('Customer')) {
+                filteredCVs[key] = cvTemplates[key];
+            }
+        }
+    } else if (type === 'management') {
+        // Show management/leadership CVs
+        for (let key in cvTemplates) {
+            if (key.includes('leader') || key.includes('manage') || key.includes('supervisor')) {
+                filteredCVs[key] = cvTemplates[key];
+            }
+        }
+    } else if (type === 'creative') {
+        // Show creative/media CVs
+        for (let key in cvTemplates) {
+            if (key.includes('creative') || key.includes('media') || key.includes('director')) {
+                filteredCVs[key] = cvTemplates[key];
+            }
+        }
+    } else if (type === 'admin') {
+        // Show admin/operations CVs
+        for (let key in cvTemplates) {
+            if (key.includes('admin') || key.includes('operations') || key.includes('office')) {
+                filteredCVs[key] = cvTemplates[key];
+            }
+        }
+    } else {
+        // Other/custom - show ALL CVs
+        filteredCVs = cvTemplates;
+    }
+    
+    // If no filtered CVs, show all
+    if (Object.keys(filteredCVs).length === 0) {
+        filteredCVs = cvTemplates;
+    }
+    
+    showSelectCV(filteredCVs);
+}
+
+// Update showSelectCV to accept filtered CVs
+function showSelectCV(filteredCVs = null) {
+    const cvsToShow = filteredCVs || cvTemplates;
+    
+    let options = '';
+    let index = 1;
+    for (let key in cvsToShow) {
+        options += `<div class="menu-option" onclick="selectCV('${key}')">${index}. ${cvsToShow[key].name}</div>`;
+        index++;
+    }
+    
+    const screen = `
+        <div class="prompt-line">🔥 SELECT CV VERSION</div>
+        <div class="prompt-line">================================</div>
+        <div class="prompt-line">Choose a CV template:</div>
+        <div class="prompt-line"> </div>
+        ${options}
+        <div class="prompt-line"> </div>
+        <div class="menu-option" onclick="showNewApplication()">← Back to Job Types</div>
+    `;
+    renderScreen(screen);
 }
 
 function showSelectCV() {
@@ -307,77 +380,73 @@ ${appState.currentCV.education}`;
 }
 
 function generateCVPDF() {
-    // Create CV content as HTML
+    // Create CV content as HTML with proper styling
     const cvContent = `
-        <div style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px;">
-            <h1 style="text-align: center; color: #333;">FEISAL SINANI KITIMLA</h1>
-            <p style="text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px;">
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Feisal Sinani Kitimla - CV</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    line-height: 1.6; 
+                    margin: 0;
+                    padding: 20px;
+                    background: white;
+                    color: black;
+                }
+                h1 { text-align: center; color: #000; margin-bottom: 5px; }
+                .contact { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+                h2 { color: #000; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+                ul { margin-top: 5px; }
+                li { margin-bottom: 5px; }
+                .footer { margin-top: 30px; font-size: 12px; text-align: center; color: #666; }
+            </style>
+        </head>
+        <body>
+            <h1>FEISAL SINANI KITIMLA</h1>
+            <div class="contact">
                 +255 759 968 552 | feistyfella@gmail.com | Dar es Salaam
-            </p>
+            </div>
             
-            <h2 style="color: #444;">PROFESSIONAL SUMMARY</h2>
+            <h2>PROFESSIONAL SUMMARY</h2>
             <p>${appState.currentCV ? appState.currentCV.summary : 'Sales Professional with 3+ years experience'}</p>
             
-            <h2 style="color: #444;">WORK EXPERIENCE</h2>
-            ${appState.currentCV ? appState.currentCV.experience.map(exp => `<p><strong>• ${exp}</strong></p>`).join('') : '<p>• Sales Officer | Goodwill Ceramics (Sept 2025–Present)</p>'}
+            <h2>WORK EXPERIENCE</h2>
+            <ul>
+            ${appState.currentCV ? appState.currentCV.experience.map(exp => `<li><strong>${exp}</strong></li>`).join('') : '<li>Sales Officer | Goodwill Ceramics (Sept 2025–Present)</li>'}
+            </ul>
             
-            <h2 style="color: #444;">KEY SKILLS</h2>
-            <p>${appState.currentCV ? appState.currentCV.skills.join(' | ') : 'Direct Sales | Client Relations | Negotiation'}</p>
+            <h2>KEY SKILLS</h2>
+            <p>${appState.currentCV ? appState.currentCV.skills.join(' • ') : 'Direct Sales • Client Relations • Negotiation'}</p>
             
-            <h2 style="color: #444;">EDUCATION</h2>
+            <h2>EDUCATION</h2>
             <p>${appState.currentCV ? appState.currentCV.education : 'CSEE Division I (2018)'}</p>
             
-            <p style="margin-top: 30px; font-size: 12px; color: #666; text-align: center;">
+            <div class="footer">
                 References available upon request
-            </p>
-        </div>
+            </div>
+        </body>
+        </html>
     `;
 
-    // Create a hidden iframe for printing
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    document.body.appendChild(iframe);
-    
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    iframeDoc.open();
-    iframeDoc.write(`
-        <html>
-            <head>
-                <title>Feisal Sinani Kitimla - CV</title>
-                <style>
-                    body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; }
-                    @media print {
-                        body { margin: 0; padding: 20px; }
-                    }
-                </style>
-            </head>
-            <body>
-                ${cvContent}
-            </body>
-        </html>
-    `);
-    iframeDoc.close();
-
-    // Trigger print dialog (Save as PDF)
-    setTimeout(() => {
-        iframe.contentWindow.focus();
-        iframe.contentWindow.print();
-        
-        // Remove iframe after printing
-        setTimeout(() => {
-            document.body.removeChild(iframe);
-        }, 1000);
-    }, 250);
+    // Create blob and download as .pdf file
+    const blob = new Blob([cvContent], { type: 'application/msword' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Feisal_Sinani_CV.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
 
     const screen = `
         <div class="prompt-line">✅ CV PDF GENERATED</div>
         <div class="prompt-line">================================</div>
-        <div class="prompt-line success">A print dialog has opened.</div>
+        <div class="prompt-line success">CV saved as "Feisal_Sinani_CV.pdf"</div>
         <div class="prompt-line"> </div>
-        <div class="prompt-line">📄 To save as PDF:</div>
-        <div class="prompt-line">1. In the print dialog, choose "Save as PDF"</div>
-        <div class="prompt-line">2. Click Save</div>
-        <div class="prompt-line">3. Attach to your email</div>
+        <div class="prompt-line">📎 File is ready to attach to emails</div>
         <div class="prompt-line"> </div>
         <button class="button" onclick="generateEmailDraft()">📧 Continue to Email</button>
         <button class="button" onclick="showGenerateOptions()">← Back</button>
@@ -387,17 +456,32 @@ function generateCVPDF() {
 }
 
 function generateEmailDraft() {
-    const subject = `Application for ${appState.jobTitle} - Feisal Sinani Kitimla`;
+    const subject = `Application for ${appState.jobTitle || 'Position'} - Feisal Sinani Kitimla`;
+    
+    let experienceText = '';
+    if (appState.currentCV && appState.currentCV.experience) {
+        experienceText = appState.currentCV.experience.map(exp => `• ${exp}`).join('\n');
+    } else {
+        experienceText = '• Sales Officer | Goodwill Ceramics (Sept 2025–Present)\n• Sales Agent | Blue Carbon Technology (Nov 2023–Aug 2025)';
+    }
+    
+    let skillsText = '';
+    if (appState.currentCV && appState.currentCV.skills) {
+        skillsText = appState.currentCV.skills.join(', ');
+    } else {
+        skillsText = 'Direct Sales, Client Relationships, Negotiation';
+    }
+    
     const body = `Dear Hiring Team,
 
-I am writing to apply for the ${appState.jobTitle} position at ${appState.companyName}, as advertised.
+I am writing to apply for the ${appState.jobTitle || 'Sales'} position at ${appState.companyName || 'your company'}, as advertised.
 
-${appState.currentCV.summary}
+${appState.currentCV ? appState.currentCV.summary : 'Results-driven Sales Professional with 3+ years of experience in direct sales, customer relationship management, and territory expansion. Proven track record of exceeding targets and building lasting client relationships.'}
 
 My experience includes:
-${appState.currentCV.experience.map(exp => `• ${exp}`).join('\n')}
+${experienceText}
 
-I possess strong skills in: ${appState.currentCV.skills.join(', ')}.
+I possess strong skills in: ${skillsText}.
 
 My CV is attached for your review. I look forward to hearing from you.
 
@@ -406,14 +490,17 @@ Feisal Sinani Kitimla
 +255 759 968 552
 feistyfella@gmail.com`;
 
-    const mailtoLink = `mailto:${appState.contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    // Create mailto link
+    const mailtoLink = `mailto:${appState.contactEmail || ''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     
+    // Open in new tab/window
     const screen = `
         <div class="prompt-line">✅ EMAIL DRAFT READY</div>
         <div class="prompt-line">================================</div>
-        <div class="output-box">To: ${appState.contactEmail}\nSubject: ${subject}\n\n${body}</div>
-        <button class="button" onclick="window.location.href='${mailtoLink}'">📧 Open in Email App</button>
-        <button class="button" onclick="copyToClipboard('${subject}\\n\\n${body.replace(/'/g, "\\'")}')">📋 Copy</button>
+        <div class="output-box">To: ${appState.contactEmail || '[email address]'}\nSubject: ${subject}\n\n${body.substring(0, 200)}...</div>
+        <div class="prompt-line"> </div>
+        <button class="button" onclick="window.open('${mailtoLink}', '_blank')">📧 Open Email App</button>
+        <button class="button" onclick="copyToClipboard(\`${body.replace(/`/g, '\\`')}\`)">📋 Copy Body</button>
         <button class="button" onclick="showGenerateOptions()">← Back</button>
         <button class="button" onclick="logApplication()">📊 Log Application</button>
     `;
@@ -574,6 +661,112 @@ function showTracker() {
     `;
     renderScreen(screen);
 }
+
+// ==================== APPLICATION HISTORY ====================
+function showApplicationHistory() {
+    if (applicationTracker.length === 0) {
+        const screen = `
+            <div class="prompt-line">📋 APPLICATION HISTORY</div>
+            <div class="prompt-line">================================</div>
+            <div class="prompt-line">No applications logged yet.</div>
+            <div class="prompt-line"> </div>
+            <button class="button" onclick="showMainMenu()">← Back</button>
+        `;
+        renderScreen(screen);
+        return;
+    }
+
+    let historyList = '';
+    applicationTracker.slice().reverse().forEach((app, index) => {
+        historyList += `
+            <div class="menu-option" onclick="viewApplication(${applicationTracker.length - 1 - index})">
+                ${index+1}. ${app.company} | ${app.role} | ${app.date} | ${app.status}
+            </div>
+        `;
+    });
+
+    const screen = `
+        <div class="prompt-line">📋 APPLICATION HISTORY</div>
+        <div class="prompt-line">================================</div>
+        <div class="prompt-line">Click on any application to view details:</div>
+        <div class="prompt-line"> </div>
+        ${historyList}
+        <div class="prompt-line"> </div>
+        <button class="button" onclick="showTracker()">📊 View Stats</button>
+        <button class="button" onclick="showMainMenu()">← Back</button>
+    `;
+    renderScreen(screen);
+}
+
+function viewApplication(index) {
+    const app = applicationTracker[index];
+    
+    const screen = `
+        <div class="prompt-line">📋 APPLICATION DETAILS</div>
+        <div class="prompt-line">================================</div>
+        <div class="prompt-line"><strong>Company:</strong> ${app.company}</div>
+        <div class="prompt-line"><strong>Role:</strong> ${app.role}</div>
+        <div class="prompt-line"><strong>Date:</strong> ${app.date}</div>
+        <div class="prompt-line"><strong>Status:</strong> ${app.status}</div>
+        <div class="prompt-line"><strong>Notes:</strong> ${app.notes || 'None'}</div>
+        <div class="prompt-line"> </div>
+        <div class="prompt-line">Options:</div>
+        <button class="button" onclick="prepareToResendApplication(${index})">📧 Resend Application</button>
+        <button class="button" onclick="editApplicationNotes(${index})">✏️ Edit Notes</button>
+        <button class="button" onclick="deleteApplication(${index})">🗑️ Delete</button>
+        <div class="prompt-line"> </div>
+        <button class="button" onclick="showApplicationHistory()">← Back to History</button>
+    `;
+    renderScreen(screen);
+}
+
+function prepareToResendApplication(index) {
+    const app = applicationTracker[index];
+    
+    // Pre-fill appState with this application's data
+    appState.companyName = app.company;
+    appState.jobTitle = app.role;
+    
+    // Find matching CV (use first one as default)
+    for (let key in cvTemplates) {
+        appState.currentCV = cvTemplates[key];
+        break;
+    }
+    
+    showGenerateOptions();
+}
+
+function editApplicationNotes(index) {
+    const screen = `
+        <div class="prompt-line">✏️ EDIT NOTES</div>
+        <div class="prompt-line">================================</div>
+        <div class="prompt-line">Application: ${applicationTracker[index].company} - ${applicationTracker[index].role}</div>
+        <div class="prompt-line"> </div>
+        <div class="prompt-line">Current notes:</div>
+        <div class="output-box">${applicationTracker[index].notes || 'None'}</div>
+        <div class="prompt-line">New notes:</div>
+        <textarea class="user-input" id="newNotes" rows="4">${applicationTracker[index].notes || ''}</textarea>
+        <div class="prompt-line"> </div>
+        <button class="button" onclick="saveApplicationNotes(${index})">💾 Save</button>
+        <button class="button" onclick="viewApplication(${index})">← Cancel</button>
+    `;
+    renderScreen(screen);
+}
+
+function saveApplicationNotes(index) {
+    const newNotes = document.getElementById('newNotes').value;
+    applicationTracker[index].notes = newNotes;
+    saveData();
+    viewApplication(index);
+}
+
+function deleteApplication(index) {
+    if (confirm(`Delete application for ${applicationTracker[index].company}?`)) {
+        applicationTracker.splice(index, 1);
+        saveData();
+        showApplicationHistory();
+    }
+        }
 
 function logApplication() {
     const app = {
